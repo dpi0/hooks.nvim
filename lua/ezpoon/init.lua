@@ -79,23 +79,27 @@ local function _validate_lines(lines)
   local lines_with_errors = {}
 
   for i, line in ipairs(lines) do
-    local sep_start_index, _ = string.find(line, "=")
-    local filepath = vim.fn.trim(string.sub(line, sep_start_index + 1))
-    local key = string.match(line, "^%[(.-)%]")
     local is_valid_fp = true
     local is_valid_key = true
     local is_eq_exist = true
 
-    if vim.fn.filereadable(vim.fn.expand(filepath)) == 0 then
-      is_valid_fp = false
-    end
+    local sep_start_index, _ = string.find(line, "=")
 
-    if not (key and key:match("^[0-9a-z]$")) then
-      is_valid_key = false
-    end
-
-    if not string.find(line, "=") then
+    if not sep_start_index then
       is_eq_exist = false
+    end
+
+    if is_eq_exist then
+      local filepath = vim.fn.trim(string.sub(line, sep_start_index + 1))
+      local key = string.match(line, "^%[(.-)%]")
+
+      if vim.fn.filereadable(vim.fn.expand(filepath)) == 0 then
+        is_valid_fp = false
+      end
+
+      if not (key and key:match("^[0-9a-z]$")) then
+        is_valid_key = false
+      end
     end
 
     if not (is_valid_fp and is_valid_key and is_eq_exist) then
