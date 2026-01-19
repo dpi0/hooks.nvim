@@ -173,7 +173,6 @@ function M.menu()
 
   -- Save logic
   vim.api.nvim_create_autocmd("BufWriteCmd", {
-    group = "EZpoonMenu",
     buffer = menu_buf,
     desc = "Save EZpoon state on write",
     callback = function(_)
