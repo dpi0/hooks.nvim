@@ -35,6 +35,10 @@ end
 local function _load_state()
   local path = _get_path()
 
+  if not vim.fn.filereadable(path) then
+    _save_state()
+  end
+
   local content = table.concat(vim.fn.readfile(path))
   return vim.json.decode(content)
 end
