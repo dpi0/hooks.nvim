@@ -105,7 +105,6 @@ end
 ---@param key string
 function M.add(key)
   M.slots = _load_state()
-  print(vim.inspect(_load_state()))
   local current_file = vim.fn.expand("%:p")
 
   if current_file == "" or vim.bo.buftype ~= "" then
