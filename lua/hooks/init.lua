@@ -61,29 +61,20 @@ function M.buffer(index)
 end
 
 function M.append()
-  M.slots = _load_state()
+  _load_state()
   local file = vim.fn.expand("%:p")
 
   if file == "" or vim.bo.buftype ~= "" then
     return
   end
 
-  for _, v in pairs(M.slots) do
-    if v == file then
+  for _, existing in ipairs(M.items) do
+    if existing == file then
       return
     end
   end
 
-  local max = 0
-  for k, _ in pairs(M.slots) do
-    local n = tonumber(k)
-    if n and n > max then
-      max = n
-    end
-  end
-
-  local new_key = tostring(max + 1)
-  M.slots[new_key] = file
+  table.insert(M.items, file)
   _save_state()
 end
 
@@ -186,10 +177,7 @@ end
 ---Jump to the file registered to the specific key
 ---@param key string
 function M.jump(key)
-  M.slots = _load_state()
-  local filepath = M.slots[key]
-
-  vim.cmd.edit(filepath)
+  return M.buffer(tonumber(key))
 end
 
 -- ============================================
