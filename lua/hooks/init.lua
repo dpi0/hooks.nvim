@@ -1,5 +1,6 @@
 local M = {}
 M.slots = {}
+M.items = {}
 
 local data_dir = vim.fn.stdpath("data") .. "/hooks"
 vim.fn.mkdir(data_dir, "p")
@@ -41,7 +42,19 @@ local function _load_state()
   end
 
   local content = table.concat(vim.fn.readfile(path))
-  return vim.json.decode(content)
+  local decoded = vim.json.decode(content) or {}
+
+  M.slots = decoded
+  M.items = {}
+
+  local keys = vim.tbl_keys(decoded)
+  table.sort(keys)
+
+  for _, k in ipairs(keys) do
+    table.insert(M.items, decoded[k])
+  end
+
+  return decoded
 end
 
 ---Return a sorted array of keys
