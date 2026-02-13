@@ -27,7 +27,7 @@ end
 local function _save_state()
   local path = _get_path()
 
-  vim.fn.writefile({ vim.json.encode(M.slots) }, path)
+  vim.fn.writefile({ vim.json.encode(M.items) }, path)
 end
 
 ---Load slots depending on context.
@@ -36,25 +36,21 @@ end
 local function _load_state()
   local path = _get_path()
 
-  -- If state file does not exist, write the file
   if vim.fn.filereadable(path) == 0 then
-    _save_state()
+    vim.fn.writefile({ "[]" }, path)
   end
 
   local content = table.concat(vim.fn.readfile(path))
   local decoded = vim.json.decode(content) or {}
 
-  M.slots = decoded
-  M.items = {}
+  M.items = decoded
+  M.slots = {}
 
-  local keys = vim.tbl_keys(decoded)
-  table.sort(keys)
-
-  for _, k in ipairs(keys) do
-    table.insert(M.items, decoded[k])
+  for i, file in ipairs(decoded) do
+    M.slots[tostring(i)] = file
   end
 
-  return decoded
+  return M.slots
 end
 
 function M.buffer(index)
