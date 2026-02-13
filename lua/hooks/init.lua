@@ -1,5 +1,4 @@
 local M = {}
-M.slots = {}
 M.items = {}
 
 local data_dir = vim.fn.stdpath("data") .. "/hooks"
@@ -76,73 +75,6 @@ function M.append()
 
   table.insert(M.items, file)
   _save_state()
-end
-
----Return a sorted array of keys
----@param tbl table<string|integer, string>
----@return (string|integer)[]
-local function _sorted_keys(tbl)
-  local keys = vim.tbl_keys(tbl)
-  table.sort(keys, function(a, b)
-    return string.byte(a) < string.byte(b)
-  end)
-
-  return keys
-end
-
----Return an array of formatted lines for Menu's buffer
----@param slots table<string|integer, string>
----@param sorted_keys (string|integer)[]
----@return string[]
-local function _get_formatted_lines(slots, sorted_keys)
-  local formatted_lines = {}
-  for _, k in ipairs(sorted_keys) do
-    table.insert(formatted_lines, string.format("[%s] = %s", k, slots[k]))
-  end
-
-  return formatted_lines
-end
-
----Validate the lines to ensure correct syntax
----Filepath needs to be valid
----Returns a boolean flag indicating if all lines are valid, and a table of the lines with errors
----@param lines string[]
----@return boolean, string[]
-local function _validate_lines(lines)
-  local is_all_valid = true
-  local lines_with_errors = {}
-
-  for i, line in ipairs(lines) do
-    local is_valid_fp = true
-    local is_valid_key = true
-    local is_eq_exist = true
-
-    local sep_start_index, _ = string.find(line, "=")
-
-    if not sep_start_index then
-      is_eq_exist = false
-    end
-
-    if is_eq_exist then
-      local filepath = vim.fn.trim(string.sub(line, sep_start_index + 1))
-      local key = string.match(line, "^%[(.-)%]")
-
-      if vim.fn.filereadable(vim.fn.expand(filepath)) == 0 then
-        is_valid_fp = false
-      end
-
-      if not (key and key:match("^[0-9a-z]$")) then
-        is_valid_key = false
-      end
-    end
-
-    if not (is_valid_fp and is_valid_key and is_eq_exist) then
-      is_all_valid = false
-      table.insert(lines_with_errors, i)
-    end
-  end
-
-  return is_all_valid, lines_with_errors
 end
 
 -- ============================================
