@@ -165,6 +165,10 @@ end
 ---Add current file to Hooks
 ---@param key string
 function M.add(key)
+  if not key then
+    return M.append()
+  end
+
   M.slots = _load_state()
   local current_file = vim.fn.expand("%:p")
 
