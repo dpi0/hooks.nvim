@@ -101,8 +101,8 @@ function M.list()
   vim.api.nvim_set_option_value("buftype", "acwrite", { buf = buf })
   vim.api.nvim_set_option_value("bufhidden", "delete", { buf = buf })
 
-  local width = math.floor(vim.o.columns * 0.5)
-  local height = math.floor(vim.o.lines * 0.5)
+  local width = math.floor(vim.o.columns * 0.4)
+  local height = math.floor(vim.o.lines * 0.4)
 
   vim.api.nvim_open_win(buf, true, {
     relative = "editor",
