@@ -6,9 +6,6 @@ vim.fn.mkdir(data_dir, "p")
 
 local ns_id = vim.api.nvim_create_namespace("Hooks")
 
----Find path where arglst is saved depending on context.
----Context depends on which git repo user is in, otherwise fallback to global
----@return string
 local function _get_path()
   local context
 
@@ -65,12 +62,6 @@ function M.append()
   _save_state()
 end
 
--- ============================================
--- Action: Jump
--- ============================================
-
----Jump to the file registered to the specific key
----@param key string
 function M.jump(key)
   return M.buffer(tonumber(key))
 end
