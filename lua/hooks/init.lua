@@ -86,6 +86,10 @@ function M.list()
     border = "rounded",
   })
 
+  vim.keymap.set("n", "q", function()
+    vim.api.nvim_win_close(0, true)
+  end, { buffer = buf, silent = true })
+
   vim.api.nvim_create_autocmd("BufWriteCmd", {
     buffer = buf,
     callback = function()
