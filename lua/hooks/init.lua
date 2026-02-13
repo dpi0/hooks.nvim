@@ -64,6 +64,33 @@ function M.buffer(index)
   end
 end
 
+function M.append()
+  M.slots = _load_state()
+  local file = vim.fn.expand("%:p")
+
+  if file == "" or vim.bo.buftype ~= "" then
+    return
+  end
+
+  for _, v in pairs(M.slots) do
+    if v == file then
+      return
+    end
+  end
+
+  local max = 0
+  for k, _ in pairs(M.slots) do
+    local n = tonumber(k)
+    if n and n > max then
+      max = n
+    end
+  end
+
+  local new_key = tostring(max + 1)
+  M.slots[new_key] = file
+  _save_state()
+end
+
 ---Return a sorted array of keys
 ---@param tbl table<string|integer, string>
 ---@return (string|integer)[]
