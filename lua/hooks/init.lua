@@ -75,12 +75,7 @@ function M.jump(key)
   return M.buffer(tonumber(key))
 end
 
--- ============================================
--- Action: menu
--- ============================================
-
----Display Hooks's menu for editing
-function M.menu()
+function M.list()
   _load_state()
 
   local buf = vim.api.nvim_create_buf(false, true)
