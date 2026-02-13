@@ -57,6 +57,13 @@ local function _load_state()
   return decoded
 end
 
+function M.buffer(index)
+  M.slots = _load_state()
+  if M.items[index] then
+    vim.cmd.edit(M.items[index])
+  end
+end
+
 ---Return a sorted array of keys
 ---@param tbl table<string|integer, string>
 ---@return (string|integer)[]
