@@ -186,82 +186,43 @@ end
 
 ---Display Hooks's menu for editing
 function M.menu()
-  M.slots = _load_state()
-  local sorted_keys = _sorted_keys(M.slots)
-  local formatted_lines = _get_formatted_lines(M.slots, sorted_keys)
+  _load_state()
 
-  -- Menu's buffers settings
-  local menu_buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_set_option_value("buftype", "acwrite", { buf = menu_buf })
-  vim.api.nvim_set_option_value("bufhidden", "delete", { buf = menu_buf })
-  vim.api.nvim_buf_set_name(menu_buf, "Hooks-Menu")
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, M.items)
+  vim.api.nvim_set_option_value("buftype", "acwrite", { buf = buf })
+  vim.api.nvim_set_option_value("bufhidden", "delete", { buf = buf })
 
-  vim.api.nvim_buf_set_lines(menu_buf, 0, -1, false, formatted_lines)
+  local width = math.floor(vim.o.columns * 0.5)
+  local height = math.floor(vim.o.lines * 0.5)
 
-  -- Allow user to :q or <ESC> without prompting to save if there are no changes to the file
-  vim.api.nvim_set_option_value("modified", false, { buf = menu_buf })
-
-  vim.keymap.set("n", "<ESC>", "<CMD>q<CR>", { buffer = menu_buf, silent = true })
-
-  -- Menu's floating window settings
-  local width = math.floor(vim.o.columns * 0.6)
-  local height = math.floor(vim.o.lines * 0.6)
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
-
-  local menu_win = vim.api.nvim_open_win(menu_buf, true, {
+  vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     width = width,
     height = height,
-    row = row,
-    col = col,
-    style = "minimal",
+    row = math.floor((vim.o.lines - height)/2),
+    col = math.floor((vim.o.columns - width)/2),
     border = "rounded",
-    title = "Hooks Menu",
-    title_pos = "center",
-    footer = ":w to save | :q or ESC to quit",
-    footer_pos = "center",
   })
 
-  -- Save logic
   vim.api.nvim_create_autocmd("BufWriteCmd", {
-    buffer = menu_buf,
-    desc = "Save Hooks state on write",
-    callback = function(_)
-      vim.api.nvim_buf_clear_namespace(menu_buf, ns_id, 0, -1)
+    buffer = buf,
+    callback = function()
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      local new = {}
 
-      local new_lines = vim.api.nvim_buf_get_lines(menu_buf, 0, -1, false)
-
-      local is_all_valid, lines_with_errors = _validate_lines(new_lines)
-
-      if is_all_valid then
-        M.slots = {}
-
-        for _, line in ipairs(new_lines) do
-          local sep_start_index, _ = string.find(line, "=")
-          local filepath = vim.fn.trim(string.sub(line, sep_start_index + 1))
-          local key = string.match(line, "^%[(.-)%]")
-
-          M.slots[key] = filepath
-
-          _save_state()
+      for _, line in ipairs(lines) do
+        local trimmed = vim.fn.trim(line)
+        if trimmed ~= "" and vim.fn.filereadable(vim.fn.expand(trimmed)) == 1 then
+          table.insert(new, trimmed)
         end
-
-        vim.api.nvim_set_option_value("modified", false, { buf = menu_buf })
-        vim.notify("Hooks: State saved!", vim.log.levels.INFO)
-        vim.api.nvim_win_close(menu_win, true)
-      else
-        for _, line_num in ipairs(lines_with_errors) do
-          vim.api.nvim_buf_set_extmark(menu_buf, ns_id, line_num - 1, 0, {
-            virt_text = { { "X", "ErrorMsg" } },
-            virt_text_pos = "eol",
-          })
-        end
-        vim.notify(
-          "Hooks: Please ensure syntax is correct ([<key>] = <valid fp>), and that the file exists!",
-          vim.log.levels.ERROR
-        )
       end
+
+      M.items = new
+      _save_state()
+
+      vim.api.nvim_set_option_value("modified", false, { buf = buf })
+      vim.api.nvim_win_close(0, true)
     end,
   })
 end
