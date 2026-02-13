@@ -60,6 +60,11 @@ function M.append()
 
   table.insert(M.items, file)
   _save_state()
+
+  local index = #M.items
+  local name = vim.fn.fnamemodify(file, ":t")
+
+  vim.notify( "Hooks: Buffer [" .. name .. "] added at index [" .. index .. "]", vim.log.levels.INFO )
 end
 
 function M.jump(key)
