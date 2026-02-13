@@ -29,9 +29,6 @@ local function _save_state()
   vim.fn.writefile({ vim.json.encode(M.items) }, path)
 end
 
----Load slots depending on context.
----Context depends on which git repo user is in, otherwise fallback to global
----@return table<string|integer, string>
 local function _load_state()
   local path = _get_path()
 
@@ -40,20 +37,11 @@ local function _load_state()
   end
 
   local content = table.concat(vim.fn.readfile(path))
-  local decoded = vim.json.decode(content) or {}
-
-  M.items = decoded
-  M.slots = {}
-
-  for i, file in ipairs(decoded) do
-    M.slots[tostring(i)] = file
-  end
-
-  return M.slots
+  M.items = vim.json.decode(content) or {}
 end
 
 function M.buffer(index)
-  M.slots = _load_state()
+  _load_state()
   if M.items[index] then
     vim.cmd.edit(M.items[index])
   end
@@ -75,31 +63,6 @@ function M.append()
 
   table.insert(M.items, file)
   _save_state()
-end
-
--- ============================================
--- Action: Add
--- ============================================
-
----Add current file to Hooks
----@param key string
-function M.add(key)
-  if not key then
-    return M.append()
-  end
-
-  M.slots = _load_state()
-  local current_file = vim.fn.expand("%:p")
-
-  if current_file == "" or vim.bo.buftype ~= "" then
-    return
-  end
-
-  M.slots[key] = current_file
-
-  _save_state()
-
-  vim.notify("Hooks: " .. current_file .. " added to " .. "[" .. key .. "]", vim.log.levels.INFO)
 end
 
 -- ============================================
