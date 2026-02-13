@@ -94,6 +94,9 @@ function M.list()
     border = "rounded",
   })
 
+  vim.api.nvim_set_option_value("number", true, { win = 0 })
+  vim.api.nvim_set_option_value("relativenumber", false, { win = 0 })
+
   vim.keymap.set("n", "q", function()
     vim.api.nvim_win_close(0, true)
   end, { buffer = buf, silent = true })
