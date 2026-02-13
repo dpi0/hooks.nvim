@@ -1,6 +1,10 @@
 local M = {}
 M.items = {}
 
+M.config = {
+  remember_cursor_position = true,
+}
+
 local data_dir = vim.fn.stdpath("data") .. "/hooks"
 vim.fn.mkdir(data_dir, "p")
 
@@ -39,8 +43,23 @@ end
 
 function M.buffer(index)
   _load_state()
-  if M.items[index] then
-    vim.cmd.edit(M.items[index])
+  local file = M.items[index]
+  if not file then
+    return
+  end
+
+  vim.cmd.edit(file)
+
+  if not M.config.remember_cursor_position then
+    return
+  end
+
+  local buf = vim.api.nvim_get_current_buf()
+  local mark = vim.api.nvim_buf_get_mark(buf, '"')
+  local line_count = vim.api.nvim_buf_line_count(buf)
+
+  if mark[1] > 0 and mark[1] <= line_count then
+    pcall(vim.api.nvim_win_set_cursor, 0, mark)
   end
 end
 
@@ -121,6 +140,10 @@ function M.list()
       vim.api.nvim_win_close(0, true)
     end,
   })
+end
+
+function M.setup(opts)
+  M.config = vim.tbl_extend("force", M.config, opts or {})
 end
 
 return M
