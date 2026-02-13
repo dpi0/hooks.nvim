@@ -52,8 +52,10 @@ function M.append()
     return
   end
 
-  for _, existing in ipairs(M.items) do
+  for i, existing in ipairs(M.items) do
     if existing == file then
+      local name = vim.fn.fnamemodify(file, ":t")
+      vim.notify( "Hooks: Buffer [" .. name .. "] already present at index [" .. i .. "]", vim.log.levels.WARN )
       return
     end
   end
