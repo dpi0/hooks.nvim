@@ -70,6 +70,7 @@ function M.list()
   _load_state()
 
   local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(buf, "HooksList")
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, M.items)
   vim.api.nvim_set_option_value("buftype", "acwrite", { buf = buf })
   vim.api.nvim_set_option_value("bufhidden", "delete", { buf = buf })
