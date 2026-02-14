@@ -109,6 +109,10 @@ function M.list()
 		row = math.floor((vim.o.lines - height) / 2),
 		col = math.floor((vim.o.columns - width) / 2),
 		border = "rounded",
+		title = "Hooks - Buffer List",
+		title_pos = "center",
+		footer = ":w to save | q to quit",
+		footer_pos = "center",
 	})
 
 	vim.api.nvim_set_option_value("number", true, { win = 0 })
