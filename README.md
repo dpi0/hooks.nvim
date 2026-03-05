@@ -14,7 +14,7 @@ Hard forked from [xavierchen0/hooks.nvim](https://github.com/xavierchen0/hooks.n
 
 Basically, in it's current state, this is a lighter and simpler [ThePrimeagen/harpoon](https://github.com/ThePrimeagen/harpoon/tree/harpoon2).
 
-<img width="1412" height="795" alt="preview" src="https://github.com/user-attachments/assets/249cca1b-6569-4cf4-baa2-b2f08722d5d0" />
+<img width="1412" height="795" alt="preview" src="https://github.com/user-attachments/assets/04cb938f-bfcb-4b4f-9e23-c0f41c771f27" />
 
 ## What?
 
