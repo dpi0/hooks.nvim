@@ -21,7 +21,7 @@ local function _get_path()
 
 	local context = project_root:gsub("[\\/:]+", "_")
 
-	return data_dir .. "/" .. context
+	return data_dir .. "/" .. context, project_root
 end
 
 ---Save current state
@@ -49,6 +49,11 @@ function M.buffer(index)
 		return
 	end
 
+	local _, root = _get_path()
+	if file:sub(1, 1) ~= "/" then
+		file = root .. "/" .. file
+	end
+
 	vim.cmd.edit(file)
 
 	if not M.config.remember_cursor_position then
@@ -65,11 +70,16 @@ function M.buffer(index)
 end
 
 function M.append()
+	local _, root = _get_path()
 	_load_state()
 	local file = vim.fn.expand("%:p")
 
 	if file == "" or vim.bo.buftype ~= "" then
 		return
+	end
+
+	if file:sub(1, #root) == root then
+		file = file:sub(#root + 2)
 	end
 
 	for i, existing in ipairs(M.items) do
@@ -94,6 +104,7 @@ function M.jump(key)
 end
 
 function M.list()
+	local _, root = _get_path()
 	_load_state()
 
 	local buf = vim.api.nvim_create_buf(false, true)
@@ -133,7 +144,12 @@ function M.list()
 
 			for _, line in ipairs(lines) do
 				local trimmed = vim.fn.trim(line)
-				if trimmed ~= "" and vim.fn.filereadable(vim.fn.expand(trimmed)) == 1 then
+				local full_path = trimmed
+				if trimmed ~= "" and full_path:sub(1, 1) ~= "/" then
+					full_path = root .. "/" .. trimmed
+				end
+
+				if trimmed ~= "" and vim.fn.filereadable(full_path) == 1 then
 					table.insert(new, trimmed)
 				end
 			end
