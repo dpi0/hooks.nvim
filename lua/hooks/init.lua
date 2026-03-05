@@ -9,14 +9,17 @@ local data_dir = vim.fn.stdpath("data") .. "/hooks"
 vim.fn.mkdir(data_dir, "p")
 
 local function _get_path()
-	local context
+	local project_root
 
 	local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
-	if result.code ~= 0 then
-		context = "global"
+
+	if result.code == 0 then
+		project_root = result.stdout:gsub("\n", "")
 	else
-		context = result.stdout:gsub("\n", ""):gsub("/", "_")
+		project_root = vim.fn.getcwd()
 	end
+
+	local context = project_root:gsub("[\\/:]+", "_")
 
 	return data_dir .. "/" .. context
 end
